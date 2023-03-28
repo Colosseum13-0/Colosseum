@@ -7,35 +7,37 @@ function Event_page({ event_name, description, rules, registration }) {
   const [subtitle, setSubtitle] = useState("description");
 
   useEffect(() => {
-    if (shouldRunEffect) {
-      const spanizeWords = {
-        settings: {
-          words: document.querySelectorAll('.js-spanize'),
-        },
-        init: function() {
-          this.bindEvents();
-        },
-        bindEvents: function(){
-          const words = Array.from(this.settings.words);
-          words.forEach(function(el) {
-            const spanizer = el.innerHTML.trim().split(" ").map(function(word) {
-              if (word === '&lt;br&gt;' || word === '<br>') {
-                return '<br>';
-              } else {
-                return '<span>' + word + '</span> <span> </span>';
-              }
-            }).join("");
-            el.innerHTML = spanizer;
-          });
-        },
-      };
-      spanizeWords.init();
-    }
+    const spanizeWords = {
+      settings: {
+        words: document.querySelectorAll('.js-spanize'),
+      },
+      init: function() {
+        this.bindEvents();
+      },
+      bindEvents: function(){
+        const words = Array.from(this.settings.words);
+        words.forEach(function(el) {
+          const spanizer = el.innerHTML.trim().split(" ").map(function(word) {
+            if (word === '&lt;br&gt;' || word === '<br>') {
+              return '<br></br>';
+            } else {
+              return '<span>' + word + '</span> <span> </span>';
+            }
+          }).join("");
+          el.innerHTML = spanizer;
+        });
+      },
+    };
+    spanizeWords.init();
+
+    return () => {
+      const words = Array.from(spanizeWords.settings.words);
+      words.forEach(function(el) {
+        el.innerHTML = el.textContent;
+      });
+    };
   }, [stateValue, shouldRunEffect]);
     
-  
-  
-
   const handleClickRules = () => {
     setStateValue(rules);
     setSubtitle("rules")
@@ -58,6 +60,8 @@ function Event_page({ event_name, description, rules, registration }) {
     height:'100vh'
   }
 
+  const text = stateValue;
+
   return (
     <main className='event_info_main' style={styles4}>
       <section className="mast">
@@ -67,11 +71,8 @@ function Event_page({ event_name, description, rules, registration }) {
           <hr className="sep" />
           <h3 className="mast__title js-spanize subtitle">{subtitle}</h3>
           <div className='textbox'>
-          <p className="mast__text js-spanize">
-            {stateValue} 
-          </p>
+          <p className="contents" dangerouslySetInnerHTML={{__html: text}}/>
           </div>
-
         </header>
       </section>
       <div className='bottom'>     
